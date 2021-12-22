@@ -20,11 +20,15 @@
   #define OLED_DISPLAY_128X64
 #endif
 
+#ifdef ENCODER_ENABLE
+  #define ENCODER_RESOLUTION 2
+  #define ENCODER_COUNT 2
+  #define ENCODER_TICKS 72
+  #define ENCODER_DIRECTION_FLIP
+#endif
 // Tap settings
 #define IGNORE_MOD_TAP_INTERRUPT
 #define TAPPING_TERM 200
-
-#define ENCODER_RESOLUTION 2
 
 #define LEADER_DISPLAY_STR
 

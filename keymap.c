@@ -13,42 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include QMK_KEYBOARD_H
-#include "features/casemodes.h"
-#include "features/leader.h"
-
-enum layers {
-    _QWERTY = 0,
-    _NAV,
-    _SYM,
-    _FUNCTION,
-    _GAME,
-};
-
-enum custom_keycodes {
-    LEADER = SAFE_RANGE,
-};
-
-#define QWERTY DF(_QWERTY)
-#define GAME TG(_GAME)
-#define SYM MO(_SYM)
-#define NAV MO(_NAV)
-#define FKEYS MO(_FUNCTION)
-
-// Left-hand home row mods
-#define HOME_A LALT_T(KC_A)
-#define HOME_S LSFT_T(KC_S)
-#define HOME_D LCTL_T(KC_D)
-#define HOME_F LGUI_T(KC_F)
-
-// Right-hand home row mods
-#define HOME_J RGUI_T(KC_J)
-#define HOME_K RCTL_T(KC_K)
-#define HOME_L RSFT_T(KC_L)
-#define HOME_SCLN LALT_T(KC_SCLN)
+#include "keymap.h"
 
 // clang-format off
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Base Layer: QWERTY
@@ -60,7 +27,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
  * |        |   Z  |   X  |   C  |   V  |   B  |Record|CapsLk|  |F-keys|PlayMa|   N  |   M  | ,  < | . >  | :    |        |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |  MUTE|Leader| Enter| Space| Nav  |  | Sym  | Space|Enter |Leader| Play |
+ *                        | ENC  |Leader| Enter| Space| Nav  |  | Sym  | Space|Enter |Leader| ENC  |
  *                        |      |      |      |      |      |  |      |      |      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
@@ -68,7 +35,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      KC_TAB  , KC_Q ,  KC_W   ,  KC_E  ,   KC_R ,   KC_T ,                                        KC_Y,   KC_U ,  KC_I ,   KC_O ,  KC_P , KC_BSPC,
      KC_ESC, HOME_A,  HOME_S   ,  HOME_D  ,   HOME_F ,   KC_G ,                            KC_H,   HOME_J ,  HOME_K , HOME_L ,HOME_SCLN,  KC_QUOT,
      _______, KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_B , DM_REC1,KC_CAPS,      FKEYS  , DM_PLY1, KC_N,   KC_M ,KC_COMM, KC_DOT ,KC_COLN, _______,
-                                KC__MUTE, LEADER, KC_ENT, KC_SPC, NAV   ,     SYM    , KC_SPC,KC_ENT, LEADER, KC_MPLY
+                                ENC_L, LEADER, KC_ENT, KC_SPC, NAV   ,     SYM    , KC_SPC,KC_ENT, LEADER, ENC_R
     ),
 
 /*
@@ -207,12 +174,6 @@ void *leader_start_func(uint16_t keycode) {
         case KC_S:
             enable_xcase_with(KC_UNDS);
             return NULL;
-        /* case KC_R: */
-        /*     tap_code(DYN_REC_START1); */
-        /*     return NULL; */
-        /* case KC_P: */
-        /*     tap_code(DYN_MACRO_PLAY1); */
-        /*     return NULL; */
         default:
             return NULL;
     }
@@ -299,21 +260,14 @@ bool oled_task_user(void) {
 }
 #endif
 
-#ifdef ENCODER_ENABLE
-bool encoder_update_user(uint8_t index, bool counter_clockwise) {
-    if (index == 0) {
-        if (counter_clockwise) {
-            tap_code(KC_VOLD);
-        } else {
-            tap_code(KC_VOLU);
-        }
-    } else if (index == 1) {
-        if (counter_clockwise) {
-            tap_code(KC_MPRV);
-        } else {
-            tap_code(KC_MNXT);
-        }
-    }
-    return false;
+void matrix_init_user(void) {
+  #ifdef ENCODER_ENABLE
+    matrix_init_enc();
+  #endif
 }
-#endif
+
+void matrix_scan_user(void) {
+  #ifdef ENCODER_ENABLE
+    matrix_scan_enc();
+  #endif
+}
