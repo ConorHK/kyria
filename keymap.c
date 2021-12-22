@@ -14,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include "features/casemodes.h"
+#include "features/leader.h"
 
 enum layers {
     _QWERTY = 0,
@@ -23,17 +25,15 @@ enum layers {
     _GAME,
 };
 
-// Aliases for readability
+enum custom_keycodes {
+    LEADER = SAFE_RANGE,
+};
+
 #define QWERTY DF(_QWERTY)
 #define GAME TG(_GAME)
 #define SYM MO(_SYM)
 #define NAV MO(_NAV)
 #define FKEYS MO(_FUNCTION)
-
-#define CTL_ESC MT(MOD_LCTL, KC_ESC)
-#define CTL_QUOT MT(MOD_RCTL, KC_QUOTE)
-#define CTL_MINS MT(MOD_RCTL, KC_MINUS)
-#define ALT_ENT MT(MOD_LALT, KC_ENT)
 
 // Left-hand home row mods
 #define HOME_A LALT_T(KC_A)
@@ -47,12 +47,6 @@ enum layers {
 #define HOME_L RSFT_T(KC_L)
 #define HOME_SCLN LALT_T(KC_SCLN)
 
-#define SPACE_SHIFT RSFT_T(KC_SPC)
-
-// Note: LAlt/Enter (ALT_ENT) is not the same thing as the keyboard shortcut Alt+Enter.
-// The notation `mod/tap` denotes a key that activates the modifier `mod` when held down, and
-// produces the key `tap` when tapped (i.e. pressed and released).
-
 // clang-format off
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -62,19 +56,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------.                              ,-------------------------------------------.
  * |  Tab   |   Q  |   W  |   E  |   R  |   T  |                              |   Y  |   U  |   I  |   O  |   P  |  Bksp  |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |Ctrl/Esc|   A  |   S  |   D  |   F  |   G  |                              |   H  |   J  |   K  |   L  | ;  : |Ctrl/' "|
+ * |Ctrl/Esc|   A  |   S  |   D  |   F  |   G  |                              |   H  |   J  |   K  |   L  | ;    |   ' "  |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * | Record |   Z  |   X  |   C  |   V  |   B  | [ {  |CapsLk|  |F-keys|  ] } |   N  |   M  | ,  < | . >  | /  ? | Play   |
+ * |        |   Z  |   X  |   C  |   V  |   B  |Record|CapsLk|  |F-keys|PlayMa|   N  |   M  | ,  < | . >  | :    |        |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |  MUTE| Copy | LAlt/| Space| Nav  |  | Sym  | Space|Enter |Paste | Play |
- *                        |      |      | Enter|      |      |  |      |      |      |      |      |
+ *                        |  MUTE|Leader| Enter| Space| Nav  |  | Sym  | Space|Enter |Leader| Play |
+ *                        |      |      |      |      |      |  |      |      |      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
     [_QWERTY] = LAYOUT(
      KC_TAB  , KC_Q ,  KC_W   ,  KC_E  ,   KC_R ,   KC_T ,                                        KC_Y,   KC_U ,  KC_I ,   KC_O ,  KC_P , KC_BSPC,
-     CTL_ESC, HOME_A,  HOME_S   ,  HOME_D  ,   HOME_F ,   KC_G ,                            KC_H,   HOME_J ,  HOME_K , HOME_L ,HOME_SCLN,CTL_QUOT,
-     DM_REC1 , KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_B , KC_LBRC,KC_CAPS,     FKEYS  , KC_RBRC, KC_N,   KC_M ,KC_COMM, KC_DOT ,KC_SLSH, DM_PLY1,
-                                KC__MUTE, KC_COPY, ALT_ENT, SPACE_SHIFT, NAV   ,     SYM    , SPACE_SHIFT,ALT_ENT, KC_PSTE, KC_MPLY
+     KC_ESC, HOME_A,  HOME_S   ,  HOME_D  ,   HOME_F ,   KC_G ,                            KC_H,   HOME_J ,  HOME_K , HOME_L ,HOME_SCLN,  KC_QUOT,
+     _______, KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_B , DM_REC1,KC_CAPS,      FKEYS  , DM_PLY1, KC_N,   KC_M ,KC_COMM, KC_DOT ,KC_COLN, _______,
+                                KC__MUTE, LEADER, KC_ENT, KC_SPC, NAV   ,     SYM    , KC_SPC,KC_ENT, LEADER, KC_MPLY
     ),
 
 /*
@@ -108,7 +102,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
  * |    |   |   \  |  @   |  #   |  -   |  [   |  {   |      |  |      |   }  |   ]  |  _   |  ^   |  &   |  $   |   ?    |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |      |      |      |      |      |  |      |      |      |      |      |
+ *                        |      |  {   |  }   |  [   | ]    |  |      |      |      |      |      |
  *                        |      |      |      |      |      |  |      |      |      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
@@ -185,54 +179,136 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //     ),
 
 
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  if (!process_case_modes(keycode, record)) {
+      return false;
+  }
+
+  if (!process_leader(keycode, record)) {
+      return false;
+  }
+
+  switch (keycode) {
+      case LEADER:
+          if (record->event.pressed) {
+              start_leading();
+          }
+          return false;
+      default:
+          return true;
+  }
+}
+
+void *leader_start_func(uint16_t keycode) {
+    switch (keycode) {
+        case KC_C:
+             enable_caps_word();
+             return NULL;
+        case KC_S:
+            enable_xcase_with(KC_UNDS);
+            return NULL;
+        /* case KC_R: */
+        /*     tap_code(DYN_REC_START1); */
+        /*     return NULL; */
+        /* case KC_P: */
+        /*     tap_code(DYN_MACRO_PLAY1); */
+        /*     return NULL; */
+        default:
+            return NULL;
+    }
+}
+
 #ifdef OLED_ENABLE
-oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_180; }
+// clang format off
+static void render_kyria_logo(void) {
+    static const char PROGMEM kyria_logo[] = {
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,128,128,192,224,240,112,120, 56, 60, 28, 30, 14, 14, 14,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7, 14, 14, 14, 30, 28, 60, 56,120,112,240,224,192,128,128,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,192,224,240,124, 62, 31, 15,  7,  3,  1,128,192,224,240,120, 56, 60, 28, 30, 14, 14,  7,  7,135,231,127, 31,255,255, 31,127,231,135,  7,  7, 14, 14, 30, 28, 60, 56,120,240,224,192,128,  1,  3,  7, 15, 31, 62,124,240,224,192,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,240,252,255, 31,  7,  1,  0,  0,192,240,252,254,255,247,243,177,176, 48, 48, 48, 48, 48, 48, 48,120,254,135,  1,  0,  0,255,255,  0,  0,  1,135,254,120, 48, 48, 48, 48, 48, 48, 48,176,177,243,247,255,254,252,240,192,  0,  0,  1,  7, 31,255,252,240,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,255,255,255,  0,  0,  0,  0,  0,254,255,255,  1,  1,  7, 30,120,225,129,131,131,134,134,140,140,152,152,177,183,254,248,224,255,255,224,248,254,183,177,152,152,140,140,134,134,131,131,129,225,120, 30,  7,  1,  1,255,255,254,  0,  0,  0,  0,  0,255,255,255,  0,  0,  0,  0,255,255,  0,  0,192,192, 48, 48,  0,  0,240,240,  0,  0,  0,  0,  0,  0,240,240,  0,  0,240,240,192,192, 48, 48, 48, 48,192,192,  0,  0, 48, 48,243,243,  0,  0,  0,  0,  0,  0, 48, 48, 48, 48, 48, 48,192,192,  0,  0,  0,  0,  0,
+        0,  0,  0,255,255,255,  0,  0,  0,  0,  0,127,255,255,128,128,224,120, 30,135,129,193,193, 97, 97, 49, 49, 25, 25,141,237,127, 31,  7,255,255,  7, 31,127,237,141, 25, 25, 49, 49, 97, 97,193,193,129,135, 30,120,224,128,128,255,255,127,  0,  0,  0,  0,  0,255,255,255,  0,  0,  0,  0, 63, 63,  3,  3, 12, 12, 48, 48,  0,  0,  0,  0, 51, 51, 51, 51, 51, 51, 15, 15,  0,  0, 63, 63,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 48, 48, 63, 63, 48, 48,  0,  0, 12, 12, 51, 51, 51, 51, 51, 51, 63, 63,  0,  0,  0,  0,  0,
+        0,  0,  0,  0, 15, 63,255,248,224,128,  0,  0,  3, 15, 63,127,255,239,207,141, 13, 12, 12, 12, 12, 12, 12, 12, 30,127,225,128,  0,  0,255,255,  0,  0,128,225,127, 30, 12, 12, 12, 12, 12, 12, 12, 13,141,207,239,255,127, 63, 15,  3,  0,  0,128,224,248,255, 63, 15,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  3,  7, 15, 62,124,248,240,224,192,128,  1,  3,  7, 15, 30, 28, 60, 56,120,112,112,224,224,225,231,254,248,255,255,248,254,231,225,224,224,112,112,120, 56, 60, 28, 30, 15,  7,  3,  1,128,192,224,240,248,124, 62, 15,  7,  3,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  3,  7, 15, 14, 30, 28, 60, 56,120,112,112,112,224,224,224,224,224,224,224,224,224,224,224,224,224,224,224,224,112,112,112,120, 56, 60, 28, 30, 14, 15,  7,  3,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+    };
+    oled_write_raw_P(kyria_logo, sizeof(kyria_logo));
+}
+static void render_qmk_logo(void) {
+  static const char PROGMEM qmk_logo[] = {
+    0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,
+    0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,
+    0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0
+  };
+
+  oled_write_P(qmk_logo, false);
+}
+// clang format on
+static void render_status(void) {
+    render_qmk_logo();
+  //
+    // Host Keyboard Layer Status
+    oled_write_P(PSTR("Layer: "), false);
+    switch (get_highest_layer(layer_state)) {
+          case _QWERTY:
+              oled_write_P(PSTR("base"), false);
+              break;
+          case _NAV:
+              oled_write_P(PSTR("navigation"), false);
+              break;
+          case _SYM:
+              oled_write_P(PSTR("symbols"), false);
+              break;
+          case _FUNCTION:
+              oled_write_P(PSTR("functions"), false);
+              break;
+          case _GAME:
+              oled_write_P(PSTR("gaming"), false);
+              break;
+          default:
+              oled_write_P(PSTR("undef"), false);
+    }
+    oled_write_P(PSTR("\n"), false);
+    led_t led_usb_state = host_keyboard_led_state();
+    oled_write_P(led_usb_state.num_lock    ? PSTR("numlck ") : PSTR("       "), false);
+    oled_write_P(led_usb_state.caps_lock   ? PSTR("caplck ") : PSTR("       "), false);
+    oled_write_P(led_usb_state.scroll_lock ? PSTR("scrlck ") : PSTR("       "), false);
+    oled_write_P(PSTR("\n"), false);
+
+#ifdef LEADER_DISPLAY_STR
+    static uint16_t timer = 0;
+    if (is_leading()) {
+        oled_write_ln(leader_display_str(), false);
+        timer = timer_read();
+    }
+    else if (timer_elapsed(timer) < 175){
+        oled_write_ln(leader_display_str(), false);
+    } else {
+        timer = timer_read() - 200; // prevent it from ever looping around
+        oled_write_ln("", false);
+    }
+#endif
+}
+
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
-      oled_write_P(PSTR("\n\n\n\n"), false);
-        switch (get_highest_layer(layer_state|default_layer_state)) {
-            case _QWERTY:
-                oled_write_P(PSTR("         base\n"), false);
-                break;
-            case _NAV:
-                oled_write_P(PSTR("      navigation\n"), false);
-                break;
-            case _SYM:
-                oled_write_P(PSTR("       symbols\n"), false);
-                break;
-            case _FUNCTION:
-                oled_write_P(PSTR("      functions\n"), false);
-                break;
-            case _GAME:
-                oled_write_P(PSTR("  we're minecrafting boys\n"), false);
-                break;
-            default:
-                oled_write_P(PSTR("       undef\n"), false);
-
-        }
-        // Write host Keyboard LED Status to OLEDs
-        led_t led_usb_state = host_keyboard_led_state();
-        oled_write_P(led_usb_state.num_lock    ? PSTR("numlck ") : PSTR("       "), false);
-        oled_write_P(led_usb_state.caps_lock   ? PSTR("caplck ") : PSTR("       "), false);
-        oled_write_P(led_usb_state.scroll_lock ? PSTR("scrlck ") : PSTR("       "), false);
+        render_status();
     } else {
-        oled_write_P(PSTR("\n\n\n\n\n          :)\n"), false);
+        render_kyria_logo();
     }
   return false;
 }
 #endif
 
 #ifdef ENCODER_ENABLE
-bool encoder_update_user(uint8_t index, bool clockwise) {
+bool encoder_update_user(uint8_t index, bool counter_clockwise) {
     if (index == 0) {
-        // Volume control
-        if (clockwise) {
+        if (counter_clockwise) {
             tap_code(KC_VOLD);
         } else {
             tap_code(KC_VOLU);
         }
     } else if (index == 1) {
-        if (clockwise) {
+        if (counter_clockwise) {
             tap_code(KC_MPRV);
         } else {
             tap_code(KC_MNXT);

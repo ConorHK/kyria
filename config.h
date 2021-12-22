@@ -16,13 +16,22 @@
 
 #pragma once
 
-// Lets you roll mod-tap keys
-#define IGNORE_MOD_TAP_INTERRUPT
+#ifdef OLED_DRIVER_ENABLE
+  #define OLED_DISPLAY_128X64
+#endif
 
-// Mod timeout
+// Tap settings
+#define IGNORE_MOD_TAP_INTERRUPT
 #define TAPPING_TERM 200
 
 #define ENCODER_RESOLUTION 2
+
+#define LEADER_DISPLAY_STR
+
+// Save firmware space
+#undef LOCKING_SUPPORT_ENABLE
+#undef LOCKING_RESYNC_ENABLE
+#define LAYER_STATE_8BIT
 
 // If you are using an Elite C rev3 on the slave side, uncomment the lines below:
 //#define SPLIT_USB_DETECT
