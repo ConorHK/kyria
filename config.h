@@ -18,6 +18,13 @@
 
 #ifdef OLED_DRIVER_ENABLE
   #define OLED_DISPLAY_128X64
+  #ifdef WPM_ENABLE
+    #define SPLIT_WPM_ENABLE
+    #define WPM_ALLOW_COUNT_REGRESSION
+    #define WPM_SAMPLE_SECONDS      6
+    #define WPM_SAMPLE_PERIODS      50
+    #define WPM_ESTIMATED_WORD_SIZE 6
+  #endif
 #endif
 
 #ifdef ENCODER_ENABLE
@@ -29,6 +36,7 @@
 // Tap settings
 #define IGNORE_MOD_TAP_INTERRUPT
 #define TAPPING_TERM 200
+#define TAPPING_FORCE_HOLD
 
 #define LEADER_DISPLAY_STR
 
@@ -37,6 +45,4 @@
 #undef LOCKING_RESYNC_ENABLE
 #define LAYER_STATE_8BIT
 
-// If you are using an Elite C rev3 on the slave side, uncomment the lines below:
-//#define SPLIT_USB_DETECT
-//#define NO_USB_STARTUP_CHECK
+#define EE_HANDS

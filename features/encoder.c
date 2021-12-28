@@ -40,13 +40,13 @@ void zoom(enc_action_t action) {
 void volume(enc_action_t action) {
     switch (action & ENC_MSK) {
         case ENC_CW:
-            tap_code16(KC_AUDIO_VOL_UP);
+            tap_code16(KC_VOLU);
             break;
         case ENC_CCW:
-            tap_code16(KC_AUDIO_VOL_DOWN);
+            tap_code16(KC_VOLD);
             break;
         case ENC_DOWN:
-            tap_code16(KC_AUDIO_MUTE);
+            tap_code16(KC__MUTE);
             break;
         default:
             return;
@@ -145,20 +145,22 @@ void encoder_execute(uint8_t index, enc_action_t action) {
     layer_state_t layer = get_highest_layer(layer_state);
     if (index == 0) {  // Left encoder
         switch (layer) {
+            case _COLEMAK_DH:
             case _QWERTY:
                 scroll(action);
                 break;
             case _SYM:
-                brightness(action);
+                volume(action);
                 break;
             case _NAV:
-                volume(action);
+                brightness(action);
                 break;
             default:
                 break;
         }
     } else if (index == 1) {  // Right encoder
         switch (get_highest_layer(layer_state)) {
+            case _COLEMAK_DH:
             case _QWERTY:
                 workspace(action);
                 break;
