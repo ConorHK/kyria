@@ -6,21 +6,24 @@
 #include "features/encoder.h"
 
 enum layers {
-    _QWERTY = 0,
-    _COLEMAK_DH,
+    _COLEMAK_DH = 0,
+    _QWERTY,
     _NAV,
     _SYM,
     _FUNCTION,
+    _MOUSE,
     _GAME,
 };
 
 enum custom_keycodes {
     LEADER = SAFE_RANGE,
+    CAPSWD,
     ENC_KEYS
 };
 
 #define QWERTY DF(_QWERTY)
 #define GAME TG(_GAME)
+#define MOUSE TG(_MOUSE)
 #define SYM OSL(_SYM)
 #define NAV OSL(_NAV)
 #define FKEYS OSL(_FUNCTION)

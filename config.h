@@ -16,7 +16,7 @@
 
 #pragma once
 
-#ifdef OLED_DRIVER_ENABLE
+#ifdef OLED_ENABLE
   #define OLED_DISPLAY_128X64
   #ifdef WPM_ENABLE
     #define SPLIT_WPM_ENABLE
@@ -33,12 +33,20 @@
   #define ENCODER_TICKS 72
   #define ENCODER_DIRECTION_FLIP
 #endif
+
+#ifdef MOUSEKEY_ENABLE
+  #define MOUSEKEY_DELAY 20
+  #define MOUSEKEY_MAX_SPEED 14
+  #define MOUSEKEY_TIME_TO_MAX 30
+  #define MK_COMBINEd
+#endif
+
+#define LEADER_DISPLAY_STR
+
 // Tap settings
 #define IGNORE_MOD_TAP_INTERRUPT
 #define TAPPING_TERM 200
 #define TAPPING_FORCE_HOLD
-
-#define LEADER_DISPLAY_STR
 
 // Save firmware space
 #undef LOCKING_SUPPORT_ENABLE
