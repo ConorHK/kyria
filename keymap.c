@@ -25,7 +25,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
  * |Ctrl/Esc|   A  |   S  |   D  |   F  |   G  |                              |   H  |   J  |   K  |   L  | ;    |   ' "  |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * |        |   Z  |   X  |   C  |   V  |   B  |Record|CapsLk|  |F-keys|PlayMa|   N  |   M  | ,  < | . >  | :    |        |
+ * |        |   Z  |   X  |   C  |   V  |   B  |Copy  |CapsLk|  |F-keys|Paste |   N  |   M  | ,  < | . >  | :    |        |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
  *                        | ENC  |Leader| Enter| Space| Nav  |  | Sym  | Space|Enter |Leader| ENC  |
  *                        |      |      |      |      |      |  |      |      |      |      |      |
@@ -34,7 +34,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_QWERTY] = LAYOUT(
      KC_TAB  , KC_Q ,  KC_W   ,  KC_E  ,   KC_R ,   KC_T ,                                        KC_Y,   KC_U ,  KC_I ,   KC_O ,  KC_P , KC_BSPC,
      KC_ESC, HOME_A,  HOME_S   ,  HOME_D  ,   HOME_F ,   KC_G ,                            KC_H,   HOME_J ,  HOME_K , HOME_L ,HOME_SCLN,  KC_QUOT,
-     _______, KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_B , DM_REC1,KC_CAPS,      FKEYS  , DM_PLY1, KC_N,   KC_M ,KC_COMM, KC_DOT ,KC_COLN, _______,
+     _______, KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_B , KC_COPY,KC_CAPS,      FKEYS  , KC_PASTE, KC_N,   KC_M ,KC_COMM, KC_DOT ,KC_COLN, _______,
                                 ENC_L, LEADER, KC_ENT, KC_SPC, NAV   ,     SYM    , KC_SPC,KC_ENT, LEADER, GUI_HME
     ),
 
@@ -55,7 +55,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_COLEMAK_DH] = LAYOUT(
      KC_TAB ,   KC_Q ,  KC_W   ,  KC_F  ,   KC_P ,   KC_B ,                                        KC_J,   KC_L ,  KC_U ,   KC_Y ,KC_SCLN, KC_BSPC,
      KC_ESC ,   COLE_A ,  COLE_R   ,  COLE_S  ,   COLE_T ,   KC_G ,                        KC_M,   COLE_N ,  COLE_E ,   COLE_I ,  COLE_O , KC_QUOT,
-     _______, KC_Z ,  KC_X   ,  KC_C  ,   KC_D ,   KC_V , DM_REC1,KC_CAPS,     FKEYS  , KC_TRNS, KC_K,   KC_H ,KC_COMM, KC_DOT ,KC_SLSH, _______,
+     _______, KC_Z ,  KC_X   ,  KC_C  ,   KC_D ,   KC_V , KC_COPY,KC_CAPS,     FKEYS  , KC_PASTE, KC_K,   KC_H ,KC_COMM, KC_DOT ,KC_SLSH, _______,
                                  ENC_L, LEADER, KC_ENT, KC_SPC , NAV   ,     SYM    , KC_SPC ,KC_ENT, LEADER, GUI_HME
     ),
 
