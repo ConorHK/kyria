@@ -13,7 +13,7 @@ SRC += features/leader.c
 SRC += features/encoder.c
 
 # Save firmware space
-MAGIC_ENABLE = no
+MAGIC_ENABLE = yes
 SPACE_CADET_ENABLE = no
 GRAVE_ESC_ENABLE = no
 RGBLIGHT_ENABLE = no
