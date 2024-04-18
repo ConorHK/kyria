@@ -35,7 +35,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      KC_TAB  , KC_Q ,  KC_W   ,  KC_E  ,   KC_R ,   KC_T ,                                        KC_Y,   KC_U ,  KC_I ,   KC_O ,  KC_P , KC_BSPC,
      KC_ESC, HOME_A,  HOME_S   ,  HOME_D  ,   HOME_F ,   KC_G ,                            KC_H,   HOME_J ,  HOME_K , HOME_L ,HOME_SCLN,  KC_QUOT,
      _______, KC_Z ,  KC_X   ,  KC_C  ,   KC_V ,   KC_B , KC_COPY,KC_CAPS,      FKEYS  , KC_PASTE, KC_N,   KC_M ,KC_COMM, KC_DOT ,KC_COLN, _______,
-                                ENC_L, LEADER, KC_ENT, KC_SPC, NAV   ,     SYM    , KC_SPC,KC_ENT, LEADER, GUI_HME
+                                ENC_L, COLEMOUSE, KC_ENT, KC_SPC, NAV   ,     SYM    , KC_SPC,KC_ENT, COLEMOUSE, GUI_HME
     ),
 
 /*
@@ -56,7 +56,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      KC_TAB ,   KC_Q ,  KC_W   ,  KC_F  ,   KC_P ,   KC_B ,                                        KC_J,   KC_L ,  KC_U ,   KC_Y ,KC_SCLN, KC_BSPC,
      KC_ESC ,   COLE_A ,  COLE_R   ,  COLE_S  ,   COLE_T ,   KC_G ,                        KC_M,   COLE_N ,  COLE_E ,   COLE_I ,  COLE_O , KC_QUOT,
      _______, KC_Z ,  KC_X   ,  KC_C  ,   KC_D ,   KC_V , KC_COPY,KC_CAPS,     FKEYS  , KC_PASTE, KC_K,   KC_H ,KC_COMM, KC_DOT ,KC_SLSH,  CG_TOGG,
-                                 ENC_L, LEADER, KC_ENT, KC_SPC , NAV   ,     SYM    , KC_SPC ,KC_ENT, LEADER, GUI_HME
+                                 ENC_L, SS_PASS, KC_ENT, KC_SPC , NAV   ,     SYM    , KC_SPC ,KC_ENT, COLEMOUSE, GUI_HME
     ),
 
 /*
@@ -159,9 +159,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //  */
      [_MOUSE] = LAYOUT(
        _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
-       _______, _______, _______, KC_ACL2, KC_ACL1, _______,                                     KC_MS_LEFT, KC_MS_DOWN, KC_MS_UP, KC_MS_RIGHT, _______, _______,
-       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                                  _______, _______, _______, _______, _______,  	NAV, KC_BTN1, KC_BTN2, _______, _______
+       _______, _______, _______,  KC_MS_UP, _______, _______,                                     _______, _______, _______, _______, _______, _______,
+       _______, _______, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+                                 KC_TRNS, _______, _______, KC_ACL2, _______,  	_______, KC_BTN1, KC_BTN2, COLEMOUSE, KC_TRNS
      ),
 };
 
@@ -190,14 +190,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 enum combo_events {
   CAPSWORD,
+  SS_KPASS,
+  SS_MPASS,
   COMBO_LENGTH
 };
 uint16_t COMBO_LEN = COMBO_LENGTH; // remove the COMBO_COUNT define and use this instead!
 
 const uint16_t PROGMEM capsword_combo[] = {COLE_R, COLE_I, COMBO_END};
+const uint16_t PROGMEM kpassword_combo[] = {SS_PASS, KC_TAB, COMBO_END};
+const uint16_t PROGMEM mpassword_combo[] = {SS_PASS, KC_ESC, COMBO_END};
 
 combo_t key_combos[] = {
   [CAPSWORD] = COMBO_ACTION(capsword_combo),
+  [SS_KPASS] = COMBO_ACTION(kpassword_combo),
+  [SS_MPASS] = COMBO_ACTION(mpassword_combo),
 };
 
 void process_combo_event(uint16_t combo_index, bool pressed) {
@@ -207,6 +213,16 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
         enable_caps_word();
       }
       break;
+    case SS_KPASS:
+      if(pressed) {
+        SEND_STRING("REDATCTED\n");
+      }
+      break;
+    case SS_MPASS:
+      if(pressed) {
+        SEND_STRING("REDATCTED\n");
+      }
+      break;
   }
 }
 
@@ -214,61 +230,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (!process_case_modes(keycode, record)) {
       return false;
   }
-
-  if (!process_leader(keycode, record)) {
-      return false;
-  }
-
-  switch (keycode) {
-      case LEADER:
-          if (record->event.pressed) {
-              start_leading();
-          }
-          return false;
-      default:
-          return true;
-  }
-}
-
-void *leader_change_layer(uint16_t keycode) {
-    switch(keycode) {
-    case KC_Q:
-      layer_move(_QWERTY);
-      break;
-    case KC_C:
-      layer_move(_COLEMAK_DH);
-      break;
-    default:
-      break;
-    }
-    return NULL;
-}
-
-void *leader_start_func(uint16_t keycode) {
-    switch (keycode) {
-        case KC_S:
-            enable_xcase_with(KC_UNDS);
-            return NULL;
-        case KC_M:
-            enable_xcase_with(KC_MINS);
-            return NULL;
-        case KC_LCBR:
-            SEND_STRING("{}");
-            tap_code(KC_LEFT);
-            return NULL;
-        case KC_LBRC:
-            SEND_STRING("[]");
-            tap_code(KC_LEFT);
-            return NULL;
-        case KC_LPRN:
-            SEND_STRING("()");
-            tap_code(KC_LEFT);
-            return NULL;
-        case KC_L:
-            return leader_change_layer;
-        default:
-            return NULL;
-    }
+  return true;
 }
 
 #ifdef OLED_ENABLE
@@ -404,17 +366,7 @@ static void render_status(void) {
     oled_write_P(led_usb_state.scroll_lock ? PSTR("scrlck ") : PSTR("       "), false);
     oled_write_P(PSTR("\n"), false);
 
-
-#ifdef LEADER_DISPLAY_STR
-    static uint16_t timer = 0;
-    if (is_leading()) {
-        oled_write_ln(leader_display_str(), false);
-        timer = timer_read();
-    }
-    else if (timer_elapsed(timer) < 175){
-        oled_write_ln(leader_display_str(), false);
-    }
-    else if (get_mods() != 0) {
+    if (get_mods() != 0) {
         oled_write_P(PSTR("mods:\n"), false);
         oled_write_P((get_mods() & MOD_MASK_GUI) ? PSTR("super ") : PSTR(""), false);
         oled_write_P((get_mods() & MOD_MASK_CTRL) ? PSTR("ctrl ") : PSTR(""), false);
@@ -422,11 +374,9 @@ static void render_status(void) {
         oled_write_P((get_mods() & MOD_MASK_ALT) ? PSTR("alt ") : PSTR(""), false);
         oled_write_P(PSTR("\n"), false);
     } else {
-        timer = timer_read() - 200; // prevent it from ever looping around
         oled_write_ln("", false);
         oled_write_P(PSTR("\n"), false);
     }
-#endif
 }
 
 bool oled_task_user(void) {

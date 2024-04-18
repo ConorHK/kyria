@@ -2,7 +2,6 @@
 
 #include QMK_KEYBOARD_H
 #include "features/casemodes.h"
-#include "features/leader.h"
 #include "features/encoder.h"
 
 enum layers {
@@ -16,12 +15,13 @@ enum layers {
 };
 
 enum custom_keycodes {
-    LEADER = SAFE_RANGE,
-    CAPSWD,
+    CAPSWD = SAFE_RANGE,
+    SS_PASS,
     ENC_KEYS
 };
 
 #define QWERTY DF(_QWERTY)
+#define COLEMOUSE TG(_MOUSE)
 #define GAME TG(_GAME)
 #define MOUSE TG(_MOUSE)
 #define SYM OSL(_SYM)

@@ -83,18 +83,24 @@ void tab(enc_action_t action) {
 }
 
 void workspace(enc_action_t action) {
-    switch (action) {
+    int8_t offset = 0;
+    switch (action & ENC_MSK) {
         case ENC_CW:
-            tap_code16(G(KC_PGDOWN));
+            offset = -1;
             break;
         case ENC_CCW:
-            tap_code16(G(KC_PGUP));
+            offset = 1;
             break;
         case ENC_DOWN:
-            tap_code16(G(KC_HOME));
-            break;
+            tap_code16(KC_Q);
         default:
             return;
+    }
+    if (action & ENC_PRESSED) offset *= 5;
+    if (offset != 0) {
+        report_mouse_t report = {.v = offset};
+        tap_code16(KC_LSFT);
+        host_mouse_send(&report);
     }
 }
 
@@ -146,6 +152,7 @@ void encoder_execute(uint8_t index, enc_action_t action) {
     if (index == 0) {  // Left encoder
         switch (layer) {
             case _COLEMAK_DH:
+            case _MOUSE:
             case _QWERTY:
                 scroll(action);
                 break;
@@ -161,8 +168,9 @@ void encoder_execute(uint8_t index, enc_action_t action) {
     } else if (index == 1) {  // Right encoder
         switch (get_highest_layer(layer_state)) {
             case _COLEMAK_DH:
+            case _MOUSE:
             case _QWERTY:
-                workspace(action);
+                volume(action);
                 break;
             case _SYM:
                 zoom(action);

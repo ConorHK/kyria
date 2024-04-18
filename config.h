@@ -35,10 +35,12 @@
 #endif
 
 #ifdef MOUSEKEY_ENABLE
-  #define MOUSEKEY_DELAY 20
-  #define MOUSEKEY_MAX_SPEED 14
-  #define MOUSEKEY_TIME_TO_MAX 30
-  #define MK_COMBINEd
+  #define MOUSEKEY_DELAY 0
+  #define MOUSEKEY_MAX_SPEED 7
+  #define MOUSEKEY_TIME_TO_MAX 60
+  #define MOUSEKEY_INTERVAL 16
+  #define MOUSEKEY_WHEEL_DELAY 0
+  #define MK_COMBINED
 #endif
 
 #define LEADER_DISPLAY_STR
