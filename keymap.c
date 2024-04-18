@@ -192,6 +192,7 @@ enum combo_events {
   CAPSWORD,
   SS_KPASS,
   SS_MPASS,
+  SSH_CP_PST,
   COMBO_LENGTH
 };
 uint16_t COMBO_LEN = COMBO_LENGTH; // remove the COMBO_COUNT define and use this instead!
@@ -199,11 +200,13 @@ uint16_t COMBO_LEN = COMBO_LENGTH; // remove the COMBO_COUNT define and use this
 const uint16_t PROGMEM capsword_combo[] = {COLE_R, COLE_I, COMBO_END};
 const uint16_t PROGMEM kpassword_combo[] = {SS_PASS, KC_TAB, COMBO_END};
 const uint16_t PROGMEM mpassword_combo[] = {SS_PASS, KC_ESC, COMBO_END};
+const uint16_t PROGMEM ssh_combo[] = {COLE_E, COLE_I, KC_V, COMBO_END};
 
 combo_t key_combos[] = {
   [CAPSWORD] = COMBO_ACTION(capsword_combo),
   [SS_KPASS] = COMBO_ACTION(kpassword_combo),
   [SS_MPASS] = COMBO_ACTION(mpassword_combo),
+  [SSH_CP_PST] = COMBO_ACTION(ssh_combo),
 };
 
 void process_combo_event(uint16_t combo_index, bool pressed) {
@@ -222,6 +225,14 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
       if(pressed) {
         SEND_STRING("REDATCTED\n");
       }
+      break;
+    case SSH_CP_PST:
+      if(pressed) {
+        SEND_STRING("ssh ");
+        tap_code16(LGUI(KC_V));
+        SEND_STRING("\n");
+      }
+
       break;
   }
 }
